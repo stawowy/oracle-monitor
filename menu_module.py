@@ -51,14 +51,16 @@ class Menu:
 
         job = cron.new(command=f"python3 /home/oracle-monitor/onetime.py {to_email}")
         job.hour.every(interval)
+        cron.write()
 
         self.state = 'main_menu'
 
     def delete_monitor(self):
-        confirm = input(f"Are you sure you want to delete {self.monitoring.get_name()}? (yes/no): ").strip().lower()
+        confirm = input("Are you sure you want to delete the schedule? (yes/no): ").strip().lower()
 
         if (confirm == "yes"):
             cron.remove_all()
+            cron.write()
 
         self.state = 'main_menu'
 
@@ -66,7 +68,7 @@ class Menu:
         print("Performing One-Time Monitoring:")
         to_email = input("Provide an email address to receive the report: ")
         start_monitoring(to_email)
-        print("Process started. Expect an email in a few minutes.")
+        print("Expect an email in a few moments.")
         self.state = 'main_menu'
 
     def get_monitoring(self):

@@ -35,4 +35,3 @@ def send_email_with_attachment(subject, body, to_email, from_email, password, fi
         print(f"SMTP error occurred: {str(e)}")
     except Exception as e:
         print(f"Failed to send email: {str(e)}")
-
