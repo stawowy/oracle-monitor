@@ -1,7 +1,7 @@
 FROM jasonrivers/nagios
 
 RUN apt-get update &&\
-    apt-get install -y nmap alien libaio1 rpm iproute2 &&\
+    apt-get install -y nmap alien libaio1 rpm iproute2 dos2unix &&\
     cd /usr/share/nmap/scripts/ &&\
     git clone https://github.com/vulnersCom/nmap-vulners.git &&\
     cd / &&\
@@ -34,7 +34,10 @@ RUN apt-get update &&\
     mkdir reports &&\
     git clone https://github.com/stawowy/oracle-monitor.git &&\
     cd oracle-monitor &&\
+    dos2unix startup.sh &&\
+    dos2unix scan.sh &&\
     chmod +x startup.sh &&\
+    chmod +x scan.sh &&\
     pip install python-crontab &&\
     service cron start
     

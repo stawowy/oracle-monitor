@@ -1,6 +1,4 @@
-from typing import Any
 import smtplib
-import time
 import ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
