@@ -34,8 +34,10 @@ RUN apt-get update &&\
     mkdir reports &&\
     git clone https://github.com/stawowy/oracle-monitor.git &&\
     cd oracle-monitor &&\
+    dos2unix ip_finder.sh &&\
     dos2unix startup.sh &&\
     dos2unix scan.sh &&\
+    chmod +x ip_finder.sh &&\
     chmod +x startup.sh &&\
     chmod +x scan.sh &&\
     pip install python-crontab
