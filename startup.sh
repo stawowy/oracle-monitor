@@ -5,5 +5,5 @@ fi
 if [ -z "${ORACLE_SID}" ]; then
     export ORACLE_SID=$(nmap $(echo $IP_ADDRESS) --script oracle-sid-brute | grep oracle-sid-brute -A 1 | grep _ | awk '{print $2}')
 fi
-service cron start
+service cron start &
 python3 /home/oracle-monitor/init.py
