@@ -38,4 +38,4 @@ RUN apt-get update &&\
     pip install python-crontab &&\
     service cron start
     
-CMD [ "/home/oracle-monitor/startup.sh" ]
+ENTRYPOINT ["/home/oracle-monitor/startup.sh"]

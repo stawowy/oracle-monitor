@@ -1,3 +1,4 @@
+#!/bin/bash
 echo 'Vulnerability scan:\n' > /home/reports/report.txt
 nmap -sV --script nmap-vulners/ $(echo $IP_ADDRESS) >> /home/reports/report.txt
 echo 'DB performance/stats scan:\n' >> /home/reports/report.txt
