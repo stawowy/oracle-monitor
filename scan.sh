@@ -12,4 +12,3 @@ echo 'DB performance/stats scan:\n' >> /home/reports/report.txt
 /usr/local/nagios/libexec/check_oracle_health --connect=$(cat IP_ADDRESS.txt):1521/$(cat ORACLE_SID.txt) --username=nagios --password=nagios --mode tablespace-usage >> /home/reports/report.txt
 /usr/local/nagios/libexec/check_oracle_health --connect=$(cat IP_ADDRESS.txt):1521/$(cat ORACLE_SID.txt) --username=nagios --password=nagios --mode tablespace-fragmentation >> /home/reports/report.txt
 /usr/local/nagios/libexec/check_oracle_health --connect=$(cat IP_ADDRESS.txt):1521/$(cat ORACLE_SID.txt) --username=nagios --password=nagios --mode switch-interval >> /home/reports/report.txt
-/usr/local/nagios/libexec/check_oracle_health --connect=$(cat IP_ADDRESS.txt):1521/$(cat ORACLE_SID.txt) --username=nagios --password=nagios --mode list-sysstats >> /home/reports/report.txt

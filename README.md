@@ -5,3 +5,5 @@ Should automatically discover target IP address and DB SID when ran (might take 
 otherwise set IP_ADDRESS and ORACLE_SID when running image.
 
 Very much not-elegant, and very much NOT for production.
+
+After regular docker run startup navigate to /home/oracle-monitor and run 'python3 init.py'.
