@@ -8,4 +8,4 @@ if [ -z "${ORACLE_SID}" ] || ! [ -e ORACLE_SID.txt ]; then
     nmap $(cat /home/oracle-monitor/IP_ADDRESS.txt) --script oracle-sid-brute | grep oracle-sid-brute -A 1 | grep _ | awk '{print $2}' > ORACLE_SID.txt
 else
     echo "${ORACLE_SID}" > ORACLE_SID.txt
-fi
+fi 

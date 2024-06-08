@@ -42,4 +42,4 @@ RUN apt-get update &&\
     chmod +x scan.sh &&\
     pip install python-crontab
 
-ENTRYPOINT ["/home/oracle-monitor/startup.sh"]
+ENTRYPOINT ["/home/oracle-monitor/startup.sh"] 

@@ -72,4 +72,4 @@ class Menu:
         self.state = 'main_menu'
 
     def get_monitoring(self):
-        return self.monitoring
+        return self.monitoring 
