@@ -17,4 +17,4 @@ set /p dstmail=E-mail to receive alerts:
 (echo SRC_PASS=%srcpass%) >> vars.env
 (echo DST_MAIL=%dstmail%) >> vars.env
 
-docker run --env-file=vars.env oracle-monitor
+docker run --env-file=vars.env --name oracle-monitor -p 0.0.0.0:8080:80 --nagios-oracle-monitor:dev
