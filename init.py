@@ -72,7 +72,7 @@ def set_contact():
 def add_host():
     try:
         with open("/home/oracle-monitor/IP_ADDRESS.txt", 'r') as ipaddr:
-            ip_address = ipaddr.readline()
+            ip_address = ipaddr.readline().strip()
     except FileNotFoundError:
         print("Failed to get IP address of database server.")
         ip_address = input("Provide IP address of database server: ")
@@ -98,7 +98,7 @@ def add_host():
 def add_commands():
     try:
         with open("/home/oracle-monitor/ORACLE_SID.txt", 'r') as orasid:
-            sid = orasid.readline()
+            sid = orasid.readline().strip()
     except FileNotFoundError:
         print("Failed to get SID.")
 
@@ -108,8 +108,8 @@ def add_commands():
     try:
         # Write the updated content back to commands.cfg
         with open("/opt/nagios/etc/objects/commands.cfg", 'w') as commands:
-            newc = []
-            newc.append("""
+            commands.write(textwrap.dedent(
+                """
                 # 'notify-service-by-email' command definition
                 define command {
                     command_name        notify-service-by-email
@@ -265,10 +265,13 @@ def add_commands():
                 define command {
                     command_name    process-service-perfdata
                     command_line    /opt/nagiosgraph/bin/insert.pl
-                }\n
-                """)
+                }
+                """
+            ))
 
-            newc.append(
+
+        with open("/opt/nagios/etc/objects/commands.cfg", 'a') as commands:
+            commands.write(textwrap.dedent(
                 f"""
                 define command {{
                     command_name        check_oracle_health_tnsping
@@ -279,18 +282,16 @@ def add_commands():
                     command_name        oracle_scan_vulnerabilities
                     command_line        $USER5$/oracle_vuln_scan.py --target_addr $HOSTADDRESS$
                 }}\n
-                """)
+                """))
 
             for mode in oracle_modes:
-                newc.append(
-                f"""
+                command = textwrap.dedent(f"""
                 define command {{
                     command_name        check_oracle_health_{mode}
                     command_line        $USER5$/check_oracle_health --connect=$HOSTADDRESS$:1521/{sid} --username={dbuname} --password={dbpass} --mode {mode}
                 }}\n
                 """)
-                new_commands = ''.join(newc)
-                commands.write(textwrap.dedent(new_commands))
+                commands.write(command)
     except FileNotFoundError:
         print("File not found.")
 
@@ -298,8 +299,7 @@ def add_services():
     print("Adding nagios services...")
     try:
         with open("/opt/nagios/etc/objects/services.cfg", 'w') as services:
-            news = [] 
-            new.append("""
+            service = textwrap.dedent("""
             define service {
                 use                     generic-service
                 host_name               oracle
@@ -310,9 +310,10 @@ def add_services():
                 check_interval          5
             }
             """)
+            services.write(service)
 
             for mode in oracle_modes:
-                news.append(f"""
+                service = textwrap.dedent(f"""
                 define service {{
                     use                     generic-service
                     host_name               oracle
@@ -323,8 +324,7 @@ def add_services():
                     check_interval          5
                 }}\n
                 """)
-                new_services = ''.join(news)
-                services.write(new_services)
+                services.write(service)
     except FileNotFoundError:
         print("File not found.")
 
