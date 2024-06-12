@@ -119,7 +119,7 @@ def add_commands():
                 # 'notify-service-by-email' command definition
                 define command {
                     command_name        notify-service-by-email
-                    command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. \\nAdditional Info: \\n$SERVICEOUTPUT$"
+                    command_line        python3 $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. \\nAdditional Info: \\n$SERVICEOUTPUT$"
                 }
 
 

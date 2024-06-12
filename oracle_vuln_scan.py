@@ -27,7 +27,7 @@ def scan(target):
                 check=True, capture_output=True, text=True
             )
 
-    vulns = parse_nmap_output(contents)
+    vulns = parse_nmap_output(contents.stdout)
 
     if (len(vulns) > 0):
         subprocess.run(
