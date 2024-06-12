@@ -5,6 +5,7 @@
 import subprocess
 import os
 import sys
+import textwrap
 
 oracle_modes = ["connection-time", "connected-users", "session-usage", 
                 "process-usage", "tablespace-usage"]
@@ -13,11 +14,11 @@ def add_plugin_path():
     print("Adding path to plugins...")
     try:
         with open("/opt/nagios/etc/resource.cfg", 'a') as resource:
-            resource.write(
+            resource.write(textwrap.dedent(
                 """
                 # Store path to custom plugins
                 $USER5$=/usr/local/nagios/libexec 
-                """)
+                """))
     except FileNotFoundError:
         print("File not found.")
 
@@ -26,7 +27,7 @@ def set_contact():
 
     dest_addr = os.environ["DST_MAIL"]
     with open("/opt/nagios/etc/objects/contacts.cfg", 'w') as contacts:
-        contacts.write(
+        contacts.write(textwrap.dedent(
             f"""
             ###############################################################################
             #
@@ -66,7 +67,7 @@ def set_contact():
                 members                 nagiosadmin
             }}
             """
-        )
+        ))
 
 def add_host():
     try:
@@ -78,7 +79,7 @@ def add_host():
     
     try:
         with open("/opt/nagios/etc/objects/host.cfg", 'w') as host:
-            host.write(
+            host.write(textwrap.dedent(
                 f"""
                 define host {{
                     use                     linux-server
@@ -89,7 +90,7 @@ def add_host():
                     max_check_attempts      5
                     notification_period     24x7
                     }}
-                """)
+                """))
     except FileExistsError:
         print("Host already configured.")
 
@@ -105,36 +106,9 @@ def add_commands():
     dbuname = os.environ["DB_USER"]
     dbpass = os.environ["DB_PASS"]
     try:
-        with open("/opt/nagios/etc/objects/commands.cfg", 'r') as file:
-            # Replace old definition of notify-service-by-email
-            new_mail_notif = """
-            define command {
-                command_name        notify-service-by-email
-                command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. Additional Info: $SERVICEOUTPUT$"
-            }
-            """ 
-            lines = file.readlines()
-
-            # Find and delete the old command definition (notify-service-by-email)
-            start_index = None
-            end_index = None
-            for i, line in enumerate(lines):
-                if 'command_name    notify-service-by-email' in line:
-                    start_index = i
-                elif start_index is not None and line.strip().startswith('}'):
-                    end_index = i
-                    break
-
-            # Delete the old command definition if found
-            if start_index is not None and end_index is not None:
-                del lines[start_index:end_index + 1]
-
-            # Insert the new command definition at the end of the file
-            lines.append(new_mail_notif + '\n')
-
         # Write the updated content back to commands.cfg
         with open("/opt/nagios/etc/objects/commands.cfg", 'w') as commands:
-            commands.write(
+            commands.write(textwrap.dedent(
                 """
                 # 'notify-service-by-email' command definition
                 define command {
@@ -293,11 +267,11 @@ def add_commands():
                     command_line    /opt/nagiosgraph/bin/insert.pl
                 }
                 """
-            )
+            ))
 
 
         with open("/opt/nagios/etc/objects/commands.cfg", 'a') as commands:
-            commands.write(
+            commands.write(textwrap.dedent(
                 f"""
                 define command {{
                     command_name        check_oracle_health_tnsping
@@ -308,15 +282,15 @@ def add_commands():
                     command_name        oracle_scan_vulnerabilities
                     command_line        $USER5$/oracle_vuln_scan.py --target_addr $HOSTADDRESS$
                 }}\n
-                """)
+                """))
 
             for mode in oracle_modes:
-                command = f"""
+                command = textwrap.dedent(f"""
                 define command {{
                     command_name        check_oracle_health_{mode}
                     command_line        $USER5$/check_oracle_health --connect=$HOSTADDRESS$:1521/{sid} --username={dbuname} --password={dbpass} --mode {mode}
                 }}\n
-                """
+                """)
                 commands.write(command)
     except FileNotFoundError:
         print("File not found.")
@@ -325,31 +299,31 @@ def add_services():
     print("Adding nagios services...")
     try:
         with open("/opt/nagios/etc/objects/services.cfg", 'w') as services:
-            service = """
+            service = textwrap.dedent("""
             define service {
                 use                     generic-service
                 host_name               oracle
                 service_description     Scan oracle DB for vulnerabilities
                 check_command           oracle_scan_vulnerabilities
                 notification_options    c,w
-                contacts                admin
+                contacts                nagiosadmin
                 check_interval          5
             }
-            """
+            """)
             services.write(service)
 
             for mode in oracle_modes:
-                service = f"""
+                service = textwrap.dedent(f"""
                 define service {{
                     use                     generic-service
                     host_name               oracle
                     service_description     {mode.replace('-', ' ').title()}
                     check_command           check_oracle_health_{mode}
                     notification_options    c,w
-                    contacts                admin
+                    contacts                nagiosadmin
                     check_interval          5
                 }}\n
-                """
+                """)
                 services.write(service)
     except FileNotFoundError:
         print("File not found.")
@@ -358,12 +332,12 @@ def configure():
     print("Final config...")
     try:
         with open("/opt/nagios/etc/nagios.cfg", 'a') as nagios:
-            nagios.write(
+            nagios.write(textwrap.dedent(
                 """
                 # Custom config for Oracle DB
                 cfg_file=/opt/nagios/etc/objects/host.cfg
                 cfg_file=/opt/nagios/etc/objects/services.cfg
-                """)
+                """))
     except FileNotFoundError:
         print("File not found.")
 
