@@ -110,10 +110,16 @@ def add_commands():
         with open("/opt/nagios/etc/objects/commands.cfg", 'w') as commands:
             commands.write(textwrap.dedent(
                 """
+                # 'notify-host-by-email' command definition
+                define command{
+                    command_name    notify-host-by-email
+                    command_line    /usr/bin/printf "\%b" "***** Nagios *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\nHost: $HOSTNAME$\\nState: $HOSTSTATE$\\nAddress: $HOSTADDRESS$\\nInfo: $HOSTOUTPUT$\\n\\nDate/Time: $LONGDATETIME$\\n" | /usr/bin/mail -s "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" $CONTACTEMAIL$
+                }
+
                 # 'notify-service-by-email' command definition
                 define command {
                     command_name        notify-service-by-email
-                    command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. Additional Info: $SERVICEOUTPUT$"
+                    command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. \\nAdditional Info: \\n$SERVICEOUTPUT$"
                 }
 
 
