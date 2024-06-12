@@ -29,22 +29,6 @@ def set_contact():
         contacts.write(
             f"""
             ###############################################################################
-            # CONTACTS.CFG - SAMPLE CONTACT/CONTACTGROUP DEFINITIONS
-            #
-            #
-            # NOTES: This config file provides you with some example contact and contact
-            #        group definitions that you can reference in host and service
-            #        definitions.
-            #
-            #        You don't need to keep these definitions in a separate file from your
-            #        other object definitions.  This has been done just to make things
-            #        easier to understand.
-            #
-            ###############################################################################
-
-
-
-            ###############################################################################
             #
             # CONTACTS
             #
@@ -126,7 +110,7 @@ def add_commands():
             new_mail_notif = """
             define command {
                 command_name        notify-service-by-email
-                command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. \n\nAdditional Info:\n\n$SERVICEOUTPUT$"
+                command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. Additional Info: $SERVICEOUTPUT$"
             }
             """ 
             lines = file.readlines()
@@ -149,8 +133,174 @@ def add_commands():
             lines.append(new_mail_notif + '\n')
 
         # Write the updated content back to commands.cfg
-        with open("/opt/nagios/etc/objects/commands.cfg", 'w') as file:
-            file.writelines(lines)
+        with open("/opt/nagios/etc/objects/commands.cfg", 'w') as commands:
+            commands.write(
+                """
+                # 'notify-host-by-email' command definition
+                define command{
+                        command_name    notify-host-by-email
+                        command_line    /usr/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /usr/bin/mail -s "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" $CONTACTEMAIL$
+                    }
+
+
+                # 'notify-service-by-email' command definition
+                define command {
+                    command_name        notify-service-by-email
+                    command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. Additional Info: $SERVICEOUTPUT$"
+                }
+
+
+                # This command checks to see if a host is "alive" by pinging it
+                # The check must result in a 100% packet loss or 5 second (5000ms) round trip 
+                # average time to produce a critical error.
+                # Note: Five ICMP echo packets are sent (determined by the '-p 5' argument)
+
+                # 'check-host-alive' command definition
+                define command{
+                    command_name    check-host-alive
+                    command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5
+                }
+
+
+                # 'check_local_disk' command definition
+                define command{
+                    command_name    check_local_disk
+                    command_line    $USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
+                }
+
+
+                # 'check_local_load' command definition
+                define command{
+                    command_name    check_local_load
+                    command_line    $USER1$/check_load -w $ARG1$ -c $ARG2$
+                }
+
+
+                # 'check_local_procs' command definition
+                define command{
+                    command_name    check_local_procs
+                    command_line    $USER1$/check_procs -w $ARG1$ -c $ARG2$ -s $ARG3$
+                }
+
+
+                # 'check_local_users' command definition
+                define command{
+                    command_name    check_local_users
+                    command_line    $USER1$/check_users -w $ARG1$ -c $ARG2$
+                }   
+
+
+                # 'check_local_swap' command definition
+                define command{
+                    command_name    check_local_swap
+                    command_line    $USER1$/check_swap -w $ARG1$ -c $ARG2$
+                }
+
+
+                # 'check_local_mrtgtraf' command definition
+                define command{
+                    command_name    check_local_mrtgtraf
+                    command_line    $USER1$/check_mrtgtraf -F $ARG1$ -a $ARG2$ -w $ARG3$ -c $ARG4$ -e $ARG5$
+                }
+
+
+                # 'check_ftp' command definition
+                define command{
+                    command_name    check_ftp
+                    command_line    $USER1$/check_ftp -H $HOSTADDRESS$ $ARG1$
+                }
+
+
+                # 'check_hpjd' command definition
+                define command{
+                    command_name    check_hpjd
+                    command_line    $USER1$/check_hpjd -H $HOSTADDRESS$ $ARG1$
+                }
+
+
+                # 'check_snmp' command definition
+                define command{
+                    command_name    check_snmp
+                    command_line    $USER1$/check_snmp -H $HOSTADDRESS$ $ARG1$
+                }
+
+
+                # 'check_http' command definition
+                define command{
+                    command_name    check_http
+                    command_line    $USER1$/check_http -I $HOSTADDRESS$ $ARG1$
+                }
+
+
+                # 'check_ssh' command definition
+                define command{
+                    command_name    check_ssh
+                    command_line    $USER1$/check_ssh $ARG1$ $HOSTADDRESS$
+                }
+
+
+                # 'check_dhcp' command definition
+                define command{
+                    command_name    check_dhcp
+                    command_line    $USER1$/check_dhcp $ARG1$
+                }
+
+
+                # 'check_ping' command definition
+                define command{
+                    command_name    check_ping
+                    command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$ -p 5
+                }
+
+
+                # 'check_pop' command definition
+                define command{
+                    command_name    check_pop
+                    command_line    $USER1$/check_pop -H $HOSTADDRESS$ $ARG1$
+                }
+
+
+                # 'check_imap' command definition
+                define command{
+                    command_name    check_imap
+                    command_line    $USER1$/check_imap -H $HOSTADDRESS$ $ARG1$
+                }
+
+
+                # 'check_smtp' command definition
+                define command{
+                    command_name    check_smtp
+                    command_line    $USER1$/check_smtp -H $HOSTADDRESS$ $ARG1$
+                }
+
+
+                # 'check_tcp' command definition
+                define command{
+                        command_name    check_tcp
+                        command_line    $USER1$/check_tcp -H $HOSTADDRESS$ -p $ARG1$ $ARG2$
+                    }
+
+
+                # 'check_udp' command definition
+                define command{
+                    command_name    check_udp
+                    command_line    $USER1$/check_udp -H $HOSTADDRESS$ -p $ARG1$ $ARG2$
+                }
+
+
+                # 'check_nt' command definition
+                define command{
+                    command_name    check_nt
+                    command_line    $USER1$/check_nt -H $HOSTADDRESS$ -p 12489 -v $ARG1$ $ARG2$
+                }
+
+
+                define command {
+                    command_name    process-service-perfdata
+                    command_line    /opt/nagiosgraph/bin/insert.pl
+                }
+                """
+            )
 
 
         with open("/opt/nagios/etc/objects/commands.cfg", 'a') as commands:

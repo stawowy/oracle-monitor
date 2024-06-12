@@ -1,11 +1,10 @@
 FROM jasonrivers/nagios
 
-ENV ORACLE_HOME         /usr/lib/oracle/23/client64/
-ENV LD_LIBRARY_PATH     $LD_LIBRARY_PATH:$ORACLE_HOME/lib
-ENV PATH                ${ORACLE_HOME}bin:$PATH
+ENV LD_LIBRARY_PATH     /opt/oracle/instantclient_23_4:$LD_LIBRARY_PATH
+ENV PATH                /opt/oracle/instantclient_23_4:$PATH
 
 RUN apt-get update &&\
-    apt-get install -y nmap alien libaio1 rpm dos2unix &&\
+    apt-get install -y nmap libaio1 dos2unix &&\
     # ------------------------------------------------------
     # install vulners plugin
     # ------------------------------------------------------
@@ -14,17 +13,19 @@ RUN apt-get update &&\
     # ------------------------------------------------------
     # install Oracle CLI for check_oracle_health
     # ------------------------------------------------------
-    cd / &&\
-    wget https://download.oracle.com/otn_software/linux/instantclient/2340000/oracle-instantclient-basic-23.4.0.24.05-1.el8.x86_64.rpm &&\
-    wget https://download.oracle.com/otn_software/linux/instantclient/2340000/oracle-instantclient-devel-23.4.0.24.05-1.el8.x86_64.rpm &&\
-    wget https://download.oracle.com/otn_software/linux/instantclient/2340000/oracle-instantclient-sqlplus-23.4.0.24.05-1.el8.x86_64.rpm &&\
-    alien -i oracle-instantclient-basic-23.4.0.24.05-1.el8.x86_64.rpm &&\
-    alien -i oracle-instantclient-devel-23.4.0.24.05-1.el8.x86_64.rpm &&\
-    alien -i oracle-instantclient-sqlplus-23.4.0.24.05-1.el8.x86_64.rpm &&\
-    rm /oracle-instant* &&\
+    mkdir /opt/oracle &&\
+    cd /opt/oracle &&\
+    wget https://download.oracle.com/otn_software/linux/instantclient/2340000/instantclient-basic-linux.x64-23.4.0.24.05.zip &&\
+    wget https://download.oracle.com/otn_software/linux/instantclient/2340000/instantclient-sqlplus-linux.x64-23.4.0.24.05.zip &&\
+    wget https://download.oracle.com/otn_software/linux/instantclient/2340000/instantclient-sdk-linux.x64-23.4.0.24.05.zip &&\
+    unzip instantclient-basic-linux.x64-23.4.0.24.05.zip &&\
+    unzip -o instantclient-sdk-linux.x64-23.4.0.24.05.zip &&\
+    unzip -o instantclient-sqlplus-linux.x64-23.4.0.24.05.zip &&\
+    rm *.zip &&\ 
     # ------------------------------------------------------
     # install check_oracle_health
     # ------------------------------------------------------
+    cd / &&\
     echo 'yes' | perl -MCPAN -e 'install DBI' &&\
     echo 'yes' | perl -MCPAN -e 'install DBD::Oracle' &&\
     cd /root/.cpan/build/$(ls /root/.cpan/build | grep DBD) &&\
