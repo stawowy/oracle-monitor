@@ -93,6 +93,8 @@ def add_host():
                     check_period            24x7
                     max_check_attempts      5
                     notification_period     24x7
+                    notification_options    d,u,r,f,s
+                    notification_interval   1
                     }}
                 """))
     except FileExistsError:
@@ -316,6 +318,7 @@ def add_services():
                 service_description     Tnsping
                 check_command           check_oracle_health_tnsping
                 notification_options    c,w
+                notification_period     24x7
                 contacts                nagiosadmin
                 check_interval          5
             }
@@ -326,6 +329,7 @@ def add_services():
                 service_description     Scan oracle DB for vulnerabilities
                 check_command           oracle_scan_vulnerabilities
                 notification_options    c,w
+                notification_period     24x7
                 contacts                nagiosadmin
                 check_interval          5
             }
@@ -340,6 +344,7 @@ def add_services():
                     service_description     {mode.replace('-', ' ').title()}
                     check_command           check_oracle_health_{mode}
                     notification_options    c,w
+                    notification_period     24x7
                     contacts                nagiosadmin
                     check_interval          5
                 }}\n
