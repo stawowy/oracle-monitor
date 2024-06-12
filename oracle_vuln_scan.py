@@ -32,10 +32,10 @@ def scan(target):
     if (len(vulns) > 0):
         subprocess.run(
             [
-                'python3', 'mail.py', 
+                'python3', '/usr/local/nagios/libexec/send_mail.py', 
                 '--receiver_email', os.environ["DST_MAIL"],
-                '--subject', "Nagios vulnerability scan results"
-                '--body', contents
+                '--subject', "Nagios vulnerability scan results",
+                '--body', contents.stdout
             ])
         for cve, score in vulns:
             score = float(score)

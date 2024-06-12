@@ -44,8 +44,12 @@ def set_contact():
                 contact_name                    nagiosadmin             ; Short name of user
                 use                             generic-contact         ; Inherit default values from generic-contact template (defined above)
                 alias                           Nagios Admin            ; Full name of user
-                service_notification_options    w,c                     ; send notifications on WARNING and CRITICAL states
+                service_notification_period     24x7			        ; service notifications can be sent anytime
+                host_notification_period        24x7                    ;
+                service_notification_options    w,u,c,r,f,s             ; send notifications on everything
                 service_notification_commands   notify-service-by-email ;
+                host_notification_options       d,u,r,f,s               ;
+                host_notification_commands      notify-host-by-email    ;
                 email                           {dest_addr}
             }}
 
@@ -113,7 +117,7 @@ def add_commands():
                 # 'notify-host-by-email' command definition
                 define command{
                     command_name    notify-host-by-email
-                    command_line    /usr/bin/printf "\%b" "***** Nagios *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\nHost: $HOSTNAME$\\nState: $HOSTSTATE$\\nAddress: $HOSTADDRESS$\\nInfo: $HOSTOUTPUT$\\n\\nDate/Time: $LONGDATETIME$\\n" | /usr/bin/mail -s "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" $CONTACTEMAIL$
+                    command_line    python3 /usr/local/nagios/libexec/send_mail.py --body "***** Nagios *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\nHost: $HOSTNAME$\\nState: $HOSTSTATE$\\nAddress: $HOSTADDRESS$\\nInfo: $HOSTOUTPUT$\\n\\nDate/Time: $LONGDATETIME$\\n" --subject "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" --receiver_email $CONTACTEMAIL$
                 }
 
                 # 'notify-service-by-email' command definition
