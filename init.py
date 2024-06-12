@@ -108,8 +108,8 @@ def add_commands():
     try:
         # Write the updated content back to commands.cfg
         with open("/opt/nagios/etc/objects/commands.cfg", 'w') as commands:
-            commands.write(textwrap.dedent(
-                """
+            newc = []
+            newc.append("""
                 # 'notify-service-by-email' command definition
                 define command {
                     command_name        notify-service-by-email
@@ -265,13 +265,10 @@ def add_commands():
                 define command {
                     command_name    process-service-perfdata
                     command_line    /opt/nagiosgraph/bin/insert.pl
-                }
-                """
-            ))
+                }\n
+                """)
 
-
-        with open("/opt/nagios/etc/objects/commands.cfg", 'a') as commands:
-            commands.write(textwrap.dedent(
+            newc.append(
                 f"""
                 define command {{
                     command_name        check_oracle_health_tnsping
@@ -282,16 +279,18 @@ def add_commands():
                     command_name        oracle_scan_vulnerabilities
                     command_line        $USER5$/oracle_vuln_scan.py --target_addr $HOSTADDRESS$
                 }}\n
-                """))
+                """)
 
             for mode in oracle_modes:
-                command = textwrap.dedent(f"""
+                newc.append(
+                f"""
                 define command {{
                     command_name        check_oracle_health_{mode}
                     command_line        $USER5$/check_oracle_health --connect=$HOSTADDRESS$:1521/{sid} --username={dbuname} --password={dbpass} --mode {mode}
                 }}\n
                 """)
-                commands.write(command)
+                new_commands = ''.join(newc)
+                commands.write(textwrap.dedent(new_commands))
     except FileNotFoundError:
         print("File not found.")
 
@@ -299,7 +298,8 @@ def add_services():
     print("Adding nagios services...")
     try:
         with open("/opt/nagios/etc/objects/services.cfg", 'w') as services:
-            service = textwrap.dedent("""
+            news = [] 
+            new.append("""
             define service {
                 use                     generic-service
                 host_name               oracle
@@ -310,10 +310,9 @@ def add_services():
                 check_interval          5
             }
             """)
-            services.write(service)
 
             for mode in oracle_modes:
-                service = textwrap.dedent(f"""
+                news.append(f"""
                 define service {{
                     use                     generic-service
                     host_name               oracle
@@ -324,7 +323,8 @@ def add_services():
                     check_interval          5
                 }}\n
                 """)
-                services.write(service)
+                new_services = ''.join(news)
+                services.write(new_services)
     except FileNotFoundError:
         print("File not found.")
 
