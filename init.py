@@ -286,7 +286,7 @@ def add_commands():
                 
                 define command {{
                     command_name        oracle_scan_vulnerabilities
-                    command_line        $USER5$/oracle_vuln_scan.py --target_addr $HOSTADDRESS$
+                    command_line        python3 $USER5$/oracle_vuln_scan.py --target_addr $HOSTADDRESS$
                 }}\n
                 """))
 
@@ -306,6 +306,16 @@ def add_services():
     try:
         with open("/opt/nagios/etc/objects/services.cfg", 'w') as services:
             service = textwrap.dedent("""
+            define service {
+                use                     generic-service
+                host_name               oracle
+                service_description     Tnsping
+                check_command           check_oracle_health_tnsping
+                notification_options    c,w
+                contacts                nagiosadmin
+                check_interval          5
+            }
+
             define service {
                 use                     generic-service
                 host_name               oracle

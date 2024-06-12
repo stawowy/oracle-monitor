@@ -11,7 +11,7 @@ def parse_nmap_output(nmap_output):
     cve_pattern = re.compile(r'(CVE-\d{4}-\d+)\s+(\d+\.\d+)')
     
     # Find all matches in the Nmap output
-    matches = cve_pattern.findall(nmap_output)
+    matches = re.findall(cve_pattern, nmap_output)
     
     return matches
 
@@ -32,7 +32,7 @@ def scan(target):
     if (len(vulns) > 0):
         subprocess.run(
             [
-                'mail.py', 
+                'python3', 'mail.py', 
                 '--receiver_email', os.environ["DST_MAIL"],
                 '--subject', "Nagios vulnerability scan results"
                 '--body', contents
