@@ -53,6 +53,8 @@ RUN apt-get update &&\
     chmod +x * &&\
     rm /usr/local/bin/start_nagios &&\
     mv start_nagios /usr/local/bin &&\
+    mkdir /etc/rc.d &&\
+    mkdir /etc/rc.d/init.d &&\
     mv nagios /etc/rc.d/init.d &&\
     mv send_mail.py /usr/local/nagios/libexec &&\
     mv oracle_vuln_scan.py /usr/local/nagios/libexec

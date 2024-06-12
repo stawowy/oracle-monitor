@@ -121,14 +121,41 @@ def add_commands():
     dbuname = os.environ["DB_USER"]
     dbpass = os.environ["DB_PASS"]
     try:
+        with open("/opt/nagios/etc/objects/commands.cfg", 'r') as file:
+            # Replace old definition of notify-service-by-email
+            new_mail_notif = """
+            define command {
+                command_name        notify-service-by-email
+                command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. \n\nAdditional Info:\n\n$SERVICEOUTPUT$"
+            }
+            """ 
+            lines = file.readlines()
+
+            # Find and delete the old command definition (notify-service-by-email)
+            start_index = None
+            end_index = None
+            for i, line in enumerate(lines):
+                if 'command_name    notify-service-by-email' in line:
+                    start_index = i
+                elif start_index is not None and line.strip().startswith('}'):
+                    end_index = i
+                    break
+
+            # Delete the old command definition if found
+            if start_index is not None and end_index is not None:
+                del lines[start_index:end_index + 1]
+
+            # Insert the new command definition at the end of the file
+            lines.append(new_mail_notif + '\n')
+
+        # Write the updated content back to commands.cfg
+        with open("/opt/nagios/etc/objects/commands.cfg", 'w') as file:
+            file.writelines(lines)
+
+
         with open("/opt/nagios/etc/objects/commands.cfg", 'a') as commands:
             commands.write(
                 f"""
-                define command {{
-                    command_name        notify-service-by-email
-                    command_line        $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. \n\nAdditional Info:\n\n$SERVICEOUTPUT$"
-                }}
-
                 define command {{
                     command_name        check_oracle_health_tnsping
                     command_line        $USER5$/check_oracle_health --connect=$HOSTADDRESS$:1521/{sid} --mode tnsping
