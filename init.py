@@ -136,13 +136,6 @@ def add_commands():
         with open("/opt/nagios/etc/objects/commands.cfg", 'w') as commands:
             commands.write(
                 """
-                # 'notify-host-by-email' command definition
-                define command{
-                        command_name    notify-host-by-email
-                        command_line    /usr/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /usr/bin/mail -s "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" $CONTACTEMAIL$
-                    }
-
-
                 # 'notify-service-by-email' command definition
                 define command {
                     command_name        notify-service-by-email
@@ -158,7 +151,7 @@ def add_commands():
                 # 'check-host-alive' command definition
                 define command{
                     command_name    check-host-alive
-                    command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5
+                    command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w 3000.0,80\% \-c 5000.0,100% -p 5
                 }
 
 
