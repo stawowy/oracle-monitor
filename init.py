@@ -118,14 +118,14 @@ def add_commands():
                 """
                 # 'notify-host-by-email' command definition
                 define command{
-                    command_name    notify-host-by-email
-                    command_line    python3 /usr/local/nagios/libexec/send_mail.py --body "***** Nagios *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\nHost: $HOSTNAME$\\nState: $HOSTSTATE$\\nAddress: $HOSTADDRESS$\\nInfo: $HOSTOUTPUT$\\n\\nDate/Time: $LONGDATETIME$\\n" --subject "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" --receiver_email $CONTACTEMAIL$
+                    command_name        notify-host-by-email
+                    command_line        python3 $USER5$/send_mail.py --body "***** Nagios *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\nHost: $HOSTNAME$\\nState: $HOSTSTATE$\\nAddress: $HOSTADDRESS$\\nInfo: $HOSTOUTPUT$\\n\\nDate/Time: $LONGDATETIME$\\n" --subject "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" --receiver_email $CONTACTEMAIL$
                 }
 
                 # 'notify-service-by-email' command definition
                 define command {
                     command_name        notify-service-by-email
-                    command_line        python3 $USER5$/send_email.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. \\nAdditional Info: \\n$SERVICEOUTPUT$"
+                    command_line        python3 $USER5$/send_mail.py --receiver_email $CONTACTEMAIL$ --subject "Service Alert: $SERVICEDESC$ on $HOSTNAME$ is $SERVICESTATE$" --body "Service $SERVICEDESC$ on host $HOSTNAME$ is $SERVICESTATE$. \\nAdditional Info: \\n$SERVICEOUTPUT$"
                 }
 
 
